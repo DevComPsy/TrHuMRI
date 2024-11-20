@@ -6,7 +6,7 @@ listsub = dir([sub_dir '\sub*']);
 %delete the excess data
 %sub 8 run-4 4 more volume in movement file compare to trigger on biopac
 
-for sub = 1:length(listsub)
+for sub = 2:length(listsub)
     clearvars physio_dir_sub
     subID = listsub(sub).name(end-2:end); %find subject ID
         disp(['Participant no' num2str(subID)])
