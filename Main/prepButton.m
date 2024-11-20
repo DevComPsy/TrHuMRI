@@ -1,0 +1,86 @@
+% function prepButton(mode,cols,b,g,chosen)
+%
+% TreasureHunt function
+% prepares the buttons for selection.
+%
+% @mode: defines the condition/number of buttons: 'biman': 2 buttons;
+% 'uniman': one centered button
+% @ cols: colors for 1 or 2 buttons
+% @ b: block number
+% @ g: game number
+% @ chosen: indicates which buttons was chosen. No button is highlighted if
+% empty
+%
+% TH, 09.14/12.14
+%
+function prepButton(mode,cols,b,g,chosen)
+
+global params user
+global window 
+
+size_border = 2;
+col_border = [0 0 0];
+
+if strcmp(mode,'biman')     % bimanual condition
+   
+    %highlight chosen
+    if chosen > 0 && chosen ~= 999
+        %cgrect(params.resp.biman(chosen).posXY(1),params.resp.biman(chosen).posXY(2),...
+            %params.resp.biman(chosen).sizeXY(1)+2*size_border,params.resp.biman(chosen).sizeXY(2)+2*size_border,...
+           %col_border);
+    Screen('FillRect', window, col_border, ...
+            CenterRectOnPointd([0 0 params.resp.biman(chosen).sizeXY(1) + 2 * size_border, ...
+            params.resp.biman(chosen).sizeXY(2) + 2 * size_border], ...
+            params.resp.biman(chosen).posXY(1), params.resp.biman(chosen).posXY(2)));
+    end
+        
+    % right side
+    %cgrect(params.resp.biman(1).posXY(1),params.resp.biman(1).posXY(2),...
+        %params.resp.biman(1).sizeXY(1),params.resp.biman(1).sizeXY(2),...
+        %cols(1,:));
+    Screen('FillRect', window, cols(1,:), ...
+        CenterRectOnPointd([0 0 params.resp.biman(1).sizeXY(1), params.resp.biman(1).sizeXY(2)], ...
+        params.resp.biman(1).posXY(1), params.resp.biman(1).posXY(2)));
+    
+    % Left side rectangle
+        %cgrect(params.resp.biman(2).posXY(1),params.resp.biman(2).posXY(2),...
+        %params.resp.biman(2).sizeXY(1),params.resp.biman(2).sizeXY(2),...
+        %cols(2,:));
+    Screen('FillRect', window, cols(2,:), ...
+        CenterRectOnPointd([0 0 params.resp.biman(2).sizeXY(1), params.resp.biman(2).sizeXY(2)], ...
+        params.resp.biman(2).posXY(1), params.resp.biman(2).posXY(2)));
+    
+
+elseif strcmp(mode,'uniman')    % unimanual condition
+    
+    %highlight chosen
+    if chosen > 0 && chosen ~= 999
+        %cgrect(params.resp.uniman.posXY(user.conditions.block(b).unimanPresSide(g),1),...
+            %params.resp.uniman.posXY(user.conditions.block(b).unimanPresSide(g),2),...
+            %params.resp.uniman.sizeXY(1)+2*size_border,params.resp.uniman.sizeXY(2)+2*size_border,...
+           %col_border);
+        Screen('FillRect', window, col_border, ...
+            CenterRectOnPointd([0 0 params.resp.uniman.sizeXY(1) + 2 * size_border, ...
+            params.resp.uniman.sizeXY(2) + 2 * size_border], ...
+            params.resp.uniman.posXY(user.conditions.block(b).unimanPresSide(g), 1), ...
+            params.resp.uniman.posXY(user.conditions.block(b).unimanPresSide(g), 2)));
+    
+    end
+    
+    %cgrect(params.resp.uniman.posXY(user.conditions.block(b).unimanPresSide(g),1),...
+        %params.resp.uniman.posXY(user.conditions.block(b).unimanPresSide(g),2),...
+        %params.resp.uniman.sizeXY(1),params.resp.uniman.sizeXY(2),...
+        %cols);
+    Screen('FillRect', window, cols, ...
+        CenterRectOnPointd([0 0 params.resp.uniman.sizeXY(1), params.resp.uniman.sizeXY(2)], ...
+        params.resp.uniman.posXY(user.conditions.block(b).unimanPresSide(g), 1), ...
+        params.resp.uniman.posXY(user.conditions.block(b).unimanPresSide(g), 2)));
+
+else
+    error('undefined response mode');
+end
+
+
+
+
+end
