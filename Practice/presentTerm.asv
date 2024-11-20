@@ -1,0 +1,68 @@
+function presentTerm(b,g,term_cond,mode,cols,chosen,currOutcome)
+
+
+global user params
+global window
+
+%readkeys
+%logkeys
+
+[pressed, firstPressTimes] = KbQueueCheck(); % Read keypresses
+if pressed
+    logFile = fopen('key_log.txt', 'a'); % Open log file
+    keyPressTimes = find(firstPressTimes);
+    for i = 1:length(keyPressTimes)
+        fprintf(logFile, 'Key %d pressed at time %.3f\n', keyPressTimes(i), firstPressTimes(keyPressTimes(i)));
+    end
+    fclose(logFile); % Close log file after logging
+end
+
+
+%clearpict(3)
+Screen('FillRect', window,params.map.bg_col);
+prepOutcome(currOutcome);
+prepTermCond(term_cond);
+
+borderPosition = [params.map.posXY(1) - (params.map.sizeXY(1) + params.map.borderSize / 2) / 2, ...
+              params.map.posXY(2) - (params.map.sizeXY(2) + params.map.borderSize / 2) / 2, ...
+              params.map.posXY(1) + (params.map.sizeXY(1) + params.map.borderSize / 2) / 2, ...
+              params.map.posXY(2) + (params.map.sizeXY(2) + params.map.borderSize / 2) / 2];
+
+% Draw map
+rectPosition = [params.map.posXY(1) - params.map.sizeXY(1) / 2, ...
+           params.map.posXY(2) - params.map.sizeXY(2) / 2, ...
+           params.map.posXY(1) + params.map.sizeXY(1) / 2, ...
+           params.map.posXY(2) + params.map.sizeXY(2) / 2];
+
+
+
+
+
+% First, draw the border (if applicable)
+Screen('FillRect', window, params.map.col , borderPosition);
+
+% Then, draw the inner rectangle
+Screen('FillRect', window, params.colSp.terminationCol, rectPosition);
+
+
+prepButton(mode,cols,b,g,chosen)
+prepFixCross();
+
+% present
+%cgflip('v')
+%t_tmp = drawpict(3);
+
+Screen('Flip', window); 
+t_tmp = GetSecs;
+
+outportb(params.trigger.scanport, params.trigger.tr_Termination);
+logstring=[num2str(t_tmp) '; Termination'];
+disp(logstring);
+%wait(params.trigger.nulltime)
+WaitSecs(params.trigger.nulltime);
+
+% how long to present
+%waituntil(params.task.term_dur + t_tmp);
+WaitSecs(params.task.term_dur);
+%wait(params.trigger.nulltime)
+WaitSecs(params.trigger.nulltime);
