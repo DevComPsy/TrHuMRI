@@ -3,5 +3,5 @@ There are two practices, one without long and short horizons across trials (type
 There is a PDF file in the Practice folder which outlines instructions to provide to participants.
 
 
-The main task is located in the main folder and can be started by running the information_gathering.m file. 
+The main task is located in the main folder and can be started by running the **information_gathering.m** file. 
 The first input is the subject number, the second one is the run. The task is coded for 4 runs but can be easily adapted for more.
