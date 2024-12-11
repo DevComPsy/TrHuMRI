@@ -1,0 +1,7 @@
+Training:
+
+
+Testing: 
+- Add the TreasHunt foldr to your path on MATLAB
+- Clear PsychToolbox using sca command
+- run information_gathering function using the subject ID and run number (information_gathering(999,1) for subject 999 run 1 for example)
