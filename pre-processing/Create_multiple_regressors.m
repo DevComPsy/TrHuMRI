@@ -1,12 +1,16 @@
 % Physiological regressors creation
 
 sub_dir = 'D:\InformationGatheringMRI\derivatives';
+% sub_dir = 'F:\trHunt';
 listsub = dir([sub_dir '\sub*']);
 %sub 8 run-3, timing was restarted at the end of the block, the script
 %delete the excess data
 %sub 8 run-4 4 more volume in movement file compare to trigger on biopac
+%but no error found
 
-for sub = 2:length(listsub)
+
+%% Run the physio
+for sub = 15%length(listsub)-1
     clearvars physio_dir_sub
     subID = listsub(sub).name(end-2:end); %find subject ID
         disp(['Participant no' num2str(subID)])
@@ -14,12 +18,14 @@ for sub = 2:length(listsub)
     physio_dir_sub = dir([sub_dir '\' listsub(sub).name '\physio']); %find physio files (can be done better)
     physio_dir_sub = physio_dir_sub(~ismember({physio_dir_sub(:).name},{'.','..'})); %Remove useless files
 
+    % physio_dir_sub = physio_dir_sub(ismember({physio_dir_sub(:).name},{'multiple','txt'})); %Remove useless files
+
 
     rp_file = dir([sub_dir '\' listsub(sub).name '\func\rp*']);
     [~,ind]=sort({rp_file.name}); %make sure that it reads the block from 1 to 4
     rp_file = rp_file(ind);
 
-    for block = 1:length(rp_file)
+    for block =1:length(rp_file)
 
         physio = readtable([physio_dir_sub(block).folder '\' physio_dir_sub(block).name]); %Read filename
 
@@ -109,9 +115,12 @@ for sub = 2:length(listsub)
         matlabbatch{1}.spm.tools.physio.scan_timing.sqpar.time_slice_to_slice = [];
         matlabbatch{1}.spm.tools.physio.scan_timing.sqpar.Nprep = [];
         matlabbatch{1}.spm.tools.physio.scan_timing.sync.nominal = struct([]);
-        matlabbatch{1}.spm.tools.physio.preproc.cardiac.modality = 'ECG';
-        matlabbatch{1}.spm.tools.physio.preproc.cardiac.filter.no = struct([]);
+        matlabbatch{1}.spm.tools.physio.preproc.cardiac.modality = 'PPU';
+        matlabbatch{1}.spm.tools.physio.preproc.cardiac.filter.yes.type = 'cheby2';
+        matlabbatch{1}.spm.tools.physio.preproc.cardiac.filter.yes.passband = [0.3 9];
+        matlabbatch{1}.spm.tools.physio.preproc.cardiac.filter.yes.stopband = [];
         matlabbatch{1}.spm.tools.physio.preproc.cardiac.initial_cpulse_select.auto_matched.min = 0.4;
+
         matlabbatch{1}.spm.tools.physio.preproc.cardiac.initial_cpulse_select.auto_matched.file = 'initial_cpulse_kRpeakfile.mat';
         matlabbatch{1}.spm.tools.physio.preproc.cardiac.initial_cpulse_select.auto_matched.max_heart_rate_bpm = 90;
         matlabbatch{1}.spm.tools.physio.preproc.cardiac.posthoc_cpulse_select.off = struct([]);
@@ -133,9 +142,51 @@ for sub = 2:length(listsub)
         matlabbatch{1}.spm.tools.physio.model.movement.yes.censoring_threshold = 0.5;
         matlabbatch{1}.spm.tools.physio.model.other.no = struct([]);
         matlabbatch{1}.spm.tools.physio.verbose.level = 0;
-        matlabbatch{1}.spm.tools.physio.verbose.fig_output_file = 'plot.jpg';
-        matlabbatch{1}.spm.tools.physio.verbose.use_tabs = true;
+        
+        matlabbatch{1}.spm.tools.physio.verbose.fig_output_file = ['figures_block' num2str(block),'.jpg'];
+        matlabbatch{1}.spm.tools.physio.verbose.use_tabs = false;
         spm_jobman('run',matlabbatch(1));
 
     end
 end
+
+%% Check regressors
+are_equal = [];
+for sub = 16:length(listsub)
+
+        clearvars physio_dir_sub
+    subID = listsub(sub).name(end-2:end); %find subject ID
+        disp(['Participant no' num2str(subID)])
+
+    physio_dir_sub = dir([sub_dir '\' listsub(sub).name '\physio']); %find physio files (can be done better)
+    physio_dir_sub = physio_dir_sub(contains({physio_dir_sub.name}, 'multiple_') & ...
+                                 contains({physio_dir_sub.name}, '.txt'));
+
+    rp_file = dir([sub_dir '\' listsub(sub).name '\func\rp*']);
+    [~,ind]=sort({rp_file.name}); %make sure that it reads the block from 1 to 4
+    rp_file = rp_file(ind);
+
+    %check for error
+    if length(rp_file) ~= length(physio_dir_sub)
+        warning('Mismatch bitween rp and physio')
+    end
+
+    for block = 1:length(rp_file)
+        mrf = table2array(readtable([sub_dir '\' listsub(sub).name '\physio\multiple_regressors-run',num2str(block) '.txt']));
+        rp = load([rp_file(block).folder '\' rp_file(block).name]);
+
+        %Check that column 18:24
+
+        rp_in_mrf = mrf(:,19:24);
+        are_equal(end+1) = isequal(rp_in_mrf, rp);
+        if are_equal(end) == 0
+            warning('mismatch')
+        end
+
+        
+% Display the result
+
+    end
+
+end
+
