@@ -59,7 +59,7 @@ params.task.taskversion_date        = [2024 10 14];
 params.task.author                  = 'TUH';
 params.task.modifier                = 'AM - KK - LK';
 
-params.task.exp.n_blocks            = 3;
+params.task.exp.n_blocks            = 4;
 params.task.exp.n_games             = 40;
 params.task.exp.n_trials            = 120;
 

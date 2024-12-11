@@ -40,6 +40,14 @@ if block == 3
             lastFile = userfile(end);  % get the last file in the list
         load([lastFile.folder '\' lastFile.name] ,'user' ,'params');
 end
+if block == 4
+    params.general.res_dir              = [pwd '\logs\'];
+    params.general.rest_dir_participant = [params.general.res_dir,num2str(userID) '\'] ;
+    userfile = dir([params.general.rest_dir_participant ,'*block_3*']);
+    disp(['found ' num2str(length(userfile)) ' files, taking the last one'])
+            lastFile = userfile(end);  % get the last file in the list
+        load([lastFile.folder '\' lastFile.name] ,'user' ,'params');
+end
 
 
 
@@ -412,7 +420,7 @@ getvolume();
 save([params.general.rest_dir_participant  int2str(user.date) '_' int2str(user.ID) 'block_' int2str(b) '.mat'],'user','params');
 save([params.general.rest_dir_participant  int2str(user.date) '_' int2str(user.ID) 'block_' int2str(b) '_log.mat']);
 
-if b ==3
+if b ==4
     Screen('FillRect', window, params.general.display.bg_col);
     DrawFormattedText(window, 'finished!', 'center', 'center', params.general.display.text_col );
     
