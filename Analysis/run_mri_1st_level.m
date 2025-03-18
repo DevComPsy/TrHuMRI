@@ -3,10 +3,10 @@
 clc; close all; clear;
 
 %change this to your path
-data_path = 'D:\Observational Study\Information_gathering-main\Analysis\';
-addpath(genpath('D:\BE Code\gen_funct-master'));
-addpath(genpath('D:\Observational Study\Information_gathering-main\Analysis'));
-
+data_path = 'F:\MRI files from Aleya\';
+% addpath(genpath('D:\BE Code\gen_funct-master'));
+% addpath(genpath('D:\Observational Study\Information_gathering-main\Analysis'));
+addpath 'C:\Users\Kenza Kedri\Documents\GitHub\TrHuMRI\Analysis'
 %get foldernames
 files1 = dir(data_path);
 
@@ -22,7 +22,7 @@ bool = cellfun(@(x) ~isempty(x), matches);
 files = files1(isDir);
 files = files(bool);
 
-for i = 21%:length(files)
+for i =1%2:length(files)
     %subject loop begins
     subject = str2double(regexp(files(i).name, '\d+', 'match'));
   

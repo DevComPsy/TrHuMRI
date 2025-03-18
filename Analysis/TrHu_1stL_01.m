@@ -1,7 +1,7 @@
 function mri = TrHu_1stL_01(mri)
 % first attempt for model-based analysis
 
-analysis_num = '04';
+analysis_num = '05';
 
 mri.epi_params.orth = 0;
 
@@ -11,19 +11,21 @@ mri.epi_params.orth = 0;
 % addpath('D:\myDocuments\work\Projects\Tasks\EffortLearning\modelling\v02\');
 
 %% general setup
-res_dir = ['D:\Observational Study\Information_gathering-main\Analysis\1stL\' analysis_num '\' num2str(mri.ID) '\'];
-mkdir(res_dir);
+res_dir = ['D:\InformationGatheringMRI\derivatives\sub-' num2str(mri.ID) '\1stL\' analysis_num  '\'];
+if ~exist("res_dir","dir")
+    mkdir(res_dir);
+end
 %general functions
-addpath(genpath('D:\BE Code\gen_funct-master'));
 %MRI toolbox
-addpath(genpath('D:\Observational Study\Information_gathering-main\MRI-master'))
 %% aggregate beh data
-ons =  load(['D:\Observational Study\Information_gathering-main\Analysis\BEH\' num2str(mri.ID) '\' num2str(mri.ID) 'onsets_struct.mat']);
-beh =  load(['D:\Observational Study\Information_gathering-main\Analysis\BEH\' num2str(mri.ID) '\' num2str(mri.ID) 'beh_regs.mat']);
+ons =  load(['D:\InformationGatheringMRI\BEH\' num2str(mri.ID) '\' num2str(mri.ID) 'onsets_struct.mat']);
+beh =  load(['D:\InformationGatheringMRI\BEH\' num2str(mri.ID) '\' num2str(mri.ID) 'beh_regs.mat']);
 
-
+if mri.ID == '102'
+    mri.nblocks =3;
+end
 for m = 1:mri.nblocks
-    scans{m,1} = ['D:\Observational Study\Information_gathering-main\Analysis\sub-' num2str(mri.ID) '\func\' mri.epi_dirs{m}];
+    scans{m,1} = ['D:\InformationGatheringMRI\derivatives\sub-' num2str(mri.ID) '\func\' mri.epi_dirs{m}];
 
     %replace NaNs with mean of deltaEV
     beh.beh_regs(m).deltaev(isnan(beh.beh_regs(m).deltaev))= mean(beh.beh_regs(m).deltaev(~isnan(beh.beh_regs(m).deltaev)));
@@ -32,7 +34,7 @@ for m = 1:mri.nblocks
     beh.beh_regs(m).totevminus(isnan(beh.beh_regs(m).totevminus))= mean(beh.beh_regs(m).totevminus(~isnan(beh.beh_regs(m).totevminus)));
 
     % get paths to movement regressors
-    path_to_move_params{m} =  {['D:\Observational Study\Information_gathering-main\Analysis\sub-' num2str(mri.ID)...
+    path_to_move_params{m} =  {['D:\InformationGatheringMRI\derivatives\sub-' num2str(mri.ID)...
         '\physio\multiple_regressors_new-run' num2str(m) '.txt']};
 
     %remove nans from points
@@ -94,13 +96,13 @@ for b=1:mri.nblocks
     % matlabbatch{1}.spm.stats.fmri_spec.sess(b).cond(n).pmod(1).poly = 1;     
     % matlabbatch{1}.spm.stats.fmri_spec.sess(b).cond(n).orth = mri.epi_params.orth;
 
-    % n=n+1;
-    % %response; when a button press was made
-    % matlabbatch{1}.spm.stats.fmri_spec.sess(b).cond(n).name = 'response';
-    % matlabbatch{1}.spm.stats.fmri_spec.sess(b).cond(n).onset = ons.beh(b).response;
-    % matlabbatch{1}.spm.stats.fmri_spec.sess(b).cond(n).duration = 0;
-    % matlabbatch{1}.spm.stats.fmri_spec.sess(b).cond(n).tmod = 0;
-    % 
+    n=n+1;
+    %response; when a button press was made
+    matlabbatch{1}.spm.stats.fmri_spec.sess(b).cond(n).name = 'response';
+    matlabbatch{1}.spm.stats.fmri_spec.sess(b).cond(n).onset = ons.beh(b).response;
+    matlabbatch{1}.spm.stats.fmri_spec.sess(b).cond(n).duration = 0;
+    matlabbatch{1}.spm.stats.fmri_spec.sess(b).cond(n).tmod = 0;
+
 
     % further settings (movement and physiological parameters)
     %if num2str(mri.ID) ~= 108 & b ~= 4 %skip 108 block 4
@@ -125,7 +127,7 @@ matlabbatch{2}.spm.stats.fmri_est.spmmat = {[res_dir 'SPM.mat']};
 matlabbatch{2}.spm.stats.fmri_est.method.Classical = 1;
 
 %% contrast definition
-roi = 5;   % regressors of interest
+roi = 6;   % regressors of interest
 
 %obtain number of nuisance regressors (physiological)
     for b = 1:mri.nblocks
@@ -160,9 +162,9 @@ cons(n).regr = [0 0 0 0 1];
  % cons(n).name = 'points';
  % cons(n).regr = [0 0 0 0 1];
 
-% n=n+1;
-% cons(n).name = 'response';
-% cons(n).regr = [0 0 0 0 0 1];
+n=n+1;
+cons(n).name = 'response';
+cons(n).regr = [0 0 0 0 0 1];
 
 
 

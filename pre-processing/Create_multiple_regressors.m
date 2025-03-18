@@ -10,7 +10,7 @@ listsub = dir([sub_dir '\sub*']);
 
 
 %% Run the physio
-for sub = 15%length(listsub)-1
+for sub = 32
     clearvars physio_dir_sub
     subID = listsub(sub).name(end-2:end); %find subject ID
         disp(['Participant no' num2str(subID)])
@@ -29,15 +29,24 @@ for sub = 15%length(listsub)-1
 
         physio = readtable([physio_dir_sub(block).folder '\' physio_dir_sub(block).name]); %Read filename
 
-        if isnan(physio.Var5(end,1)) %Remove the last line if the time is a NaN
+        while isnan(physio.Var5(end,1)) %Remove the last line if the time is a NaN
             physio(end,:) = [];
             disp('Last line discarded')
         end
         %if the block was redone, remove first part
         lastZeroIdx = find(physio.Var5 == 0, 1, 'last');
-        if lastZeroIdx > 1
+
+        if lastZeroIdx > 1 
+            if block ==1  && sub ==23
+                physio = physio(1:lastZeroIdx-1,:);
+                
+            else
         physio = physio(lastZeroIdx:end,:);
+            end
         end
+
+
+    
         if sub == 8 && block ==3
             timeDiff = diff(physio.Var5);
             threshold = -0.9 * max(physio.Var5);  %threshold to consider a drop of time
