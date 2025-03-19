@@ -50,7 +50,8 @@ for isub = 1:length(subIDall)
     cont_ch(find(dist2ch==1)+1) = 0;
     cont_ch = cont_ch';
     % relevant choices?
-    chidx   = find(isnan(cont_ch)==0); % choice idx!
+    %chidx   = find(isnan(cont_ch)==0); % choice idx!
+    chidx   = isnan(cont_ch);
     
     trial        = get_from_mat(pmat,'trial');
     termination         = get_from_mat(pmat,'termination');
@@ -78,7 +79,15 @@ for isub = 1:length(subIDall)
     game = get_from_mat(pmat,'game');
 
     % ---- regressors for analysis
-    allvar  = [totevminus(chidx) deltaev(chidx) trial(chidx) termination(chidx)];
+    %allvar  = [totevminus(chidx) deltaev(chidx) trial(chidx) termination(chidx)];
+    % add NaNs where participants missed trials
+   totevminus(chidx == 1, :) = NaN;
+   deltaev(chidx == 1, :) = NaN;
+   trial(chidx == 1, :) = NaN;
+   termination(chidx == 1, :) = NaN;
+
+        % ---- regressors for analysis
+    allvar  = [totevminus deltaev trial termination];
 
     %% beh GLM --------------------------------------------------------------------------------
     
@@ -93,7 +102,8 @@ for isub = 1:length(subIDall)
     allbeta.subid = subid;
     allbeta.regs = allvar;
     allbeta.regs_z = regs_z;
-    allbeta.cont_ch = cont_ch(chidx);
+    %allbeta.cont_ch = cont_ch(chidx);
+    allbeta.cont_ch = cont_ch;
 
     % save output
     betasub{isub}      = allbeta;
@@ -128,7 +138,13 @@ restoredefaultpath
 
 pcont_mmdl = fitglme(regs_all_tab, 'cont_ch ~ 1 + totevminus + deltaev + trial + termination + trial:termination + totevminus:termination + deltaev:termination + (totevminus + deltaev + trial + termination + trial:termination + totevminus:termination + deltaev:termination | userID)', 'Distribution', 'binomial','Link','logit')
 
+%% extract model predictions for fmri
+%ehsan gave us this to output the predicted choice probability per trial
+model_predictions = pcont_mmdl.predict(regs_all_tab);
 
+model_predictions = [model_predictions, regs_all(:,6)];
+
+save("model_predictions.mat", "model_predictions")
 
 % plot
 %addpath(genpath('C:\Users\mdelrio\Documents\MATLAB\4magda_fromNadescha\MEG'));

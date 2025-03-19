@@ -15,7 +15,10 @@ matches = regexp({files1([files1.isdir]).name}, {'^\d+|^A\d+'});
 bool = cellfun(@(x) any(x), matches);
 files = files1(bool);
 
-for i = 18:length(files)
+model_predictions = load('model_predictions.mat');
+model_pred = model_predictions.model_predictions;
+
+for i = 1:length(files)
     %subject loop begins
     subject = files(i).name;
 
@@ -79,7 +82,38 @@ for i = 18:length(files)
     % points(isnan(trials.trial(:,24))) = -1;%-1 point
 
         points = user.log (:,4);
+    %% Get when they made choice
+
+    pattern = [num2str(subject) '_beh.mat'];
+
+    % Search for the file that matches the pattern
+    fileInfo = dir(pattern);
+
+    load(fileInfo(1).name);
+
+    pmat = [];
+    pmat.mat    = beh.dat;
+    pmat.names  = beh.descr';
+
+    dist2ch         = get_from_mat(pmat,'distance2choice');
     
+    % dep variable (choice):
+    cont_ch    = NaN(1,length(dist2ch)); %initialise as NANs
+    % search:
+    cont_ch(find(dist2ch>0)) = 1;
+    % stop:
+    cont_ch(find(dist2ch==1)+1) = 0;
+    cont_ch = cont_ch';
+
+     %flip continue/stop
+    cont_ch = cont_ch-1;
+    cont_ch(find(cont_ch==-1)) = 1;
+    
+    %get block for splitting this variable
+    block_for_choice = get_from_mat(pmat,'block');
+
+    %% Get probability of choice from regression model
+    current_model_pred = model_pred(model_pred(:,2)==str2num(subject));
 
     %% put all regressors into struct
     
@@ -92,10 +126,12 @@ for i = 18:length(files)
         beh_regs(block).trial = data.trial(data.block == block);
         %points as regressor
         beh_regs(block).points = points(data.block == block);
-
+        %choice
+        beh_regs(block).choice = cont_ch(block_for_choice == block);
+        %prob choice
+        beh_regs(block).prob_choice = current_model_pred(block_for_choice == block);
     end 
 
-   
 
     save([num2str(subject) 'beh_regs.mat'], "beh_regs");
     disp(['Saved reg struct for' num2str(subject)]);

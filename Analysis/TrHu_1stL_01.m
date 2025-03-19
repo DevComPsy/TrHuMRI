@@ -1,7 +1,7 @@
 function mri = TrHu_1stL_01(mri)
 % first attempt for model-based analysis
 
-analysis_num = '04';
+analysis_num = '06';
 
 mri.epi_params.orth = 0;
 
@@ -37,6 +37,11 @@ for m = 1:mri.nblocks
 
     %remove nans from points
     beh.beh_regs(m).points(isnan(beh.beh_regs(m).points)) = [];
+
+    % zscore prob_choice
+    beh.beh_regs(m).prob_choice = nanzscore(beh.beh_regs(m).prob_choice);
+    %replace NaNs in prob_choice with minimum z-score
+    beh.beh_regs(m).prob_choice(isnan(beh.beh_regs(m).prob_choice)) = min(beh.beh_regs(m).prob_choice, [], "omitmissing");
   
     %make first regressor of points 0 if all correct points
     if unique(beh.beh_regs(m).points) == 2
@@ -81,7 +86,12 @@ for b=1:mri.nblocks
     matlabbatch{1}.spm.stats.fmri_spec.sess(b).cond(n).pmod(3).param = zscore(beh.beh_regs(b).totevminus);
     matlabbatch{1}.spm.stats.fmri_spec.sess(b).cond(n).pmod(3).poly = 1;     
     matlabbatch{1}.spm.stats.fmri_spec.sess(b).cond(n).orth = mri.epi_params.orth;
-   % 
+    %p(choice)
+    matlabbatch{1}.spm.stats.fmri_spec.sess(b).cond(n).pmod(4).name = 'prob_choice';
+    matlabbatch{1}.spm.stats.fmri_spec.sess(b).cond(n).pmod(4).param = beh.beh_regs(b).prob_choice;%not z-scored here because we did it above
+    matlabbatch{1}.spm.stats.fmri_spec.sess(b).cond(n).pmod(4).poly = 1;     
+    matlabbatch{1}.spm.stats.fmri_spec.sess(b).cond(n).orth = mri.epi_params.orth;
+   
     n=n+1;
     % outcome
     matlabbatch{1}.spm.stats.fmri_spec.sess(b).cond(n).name = 'outcome';
@@ -125,7 +135,7 @@ matlabbatch{2}.spm.stats.fmri_est.spmmat = {[res_dir 'SPM.mat']};
 matlabbatch{2}.spm.stats.fmri_est.method.Classical = 1;
 
 %% contrast definition
-roi = 5;   % regressors of interest
+roi = 6;   % regressors of interest
 
 %obtain number of nuisance regressors (physiological)
     for b = 1:mri.nblocks
@@ -153,8 +163,12 @@ cons(n).name = 'totevminus';
 cons(n).regr = [0 0 0 1];
 
 n=n+1;
-cons(n).name = 'outcome';
+cons(n).name = 'prob_choice';
 cons(n).regr = [0 0 0 0 1];
+
+n=n+1;
+cons(n).name = 'outcome';
+cons(n).regr = [0 0 0 0 0 1];
 
  % n=n+1;
  % cons(n).name = 'points';
