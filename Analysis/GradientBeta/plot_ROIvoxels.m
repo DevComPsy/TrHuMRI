@@ -43,7 +43,8 @@ for b = 1:size(betas,2)
             if ~isempty(beta_names)
                 title([beta_names{b} '; z = ' int2str(uzs(z))])
             else
-                title(['z = ' int2str(uzs(z))])
+                
+                % title(['z = ' int2str(uzs(z))]) comment for now
             end
             set(gca,'XTick',1:size(mtx,1),'XTicklabel',uxs)
             xlabel('x dir')

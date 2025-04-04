@@ -94,8 +94,8 @@ cd(curr_dir);
 display('done');
 
 if verbose
-    % plot_ROIvoxels(squeeze(nanmean(maskBetas))',maskXYZ')
-     plot_ROIvoxels(squeeze(nanmean(maskBetas))',maskMNI')
+    plot_ROIvoxels(squeeze(nanmean(maskBetas))',maskXYZ')
+     plot_ROIvoxels(squeeze(nanmean(maskBetas))',maskXYZ')
 
 end
 
