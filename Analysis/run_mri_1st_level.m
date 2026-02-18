@@ -3,10 +3,10 @@
 clc; close all; clear;
 
 %change this to your path
-data_path = 'F:\MRI files from Aleya\';
-% addpath(genpath('D:\BE Code\gen_funct-master'));
+data_path = 'D:\InformationGatheringMRI\derivatives\';
+addpath(genpath('C:\Users\Kenza Kedri\Documents\GitHub\gen_funct'));
 % addpath(genpath('D:\Observational Study\Information_gathering-main\Analysis'));
-addpath 'C:\Users\Kenza Kedri\Documents\GitHub\TrHuMRI\Analysis'
+
 %get foldernames
 files1 = dir(data_path);
 
@@ -21,8 +21,8 @@ bool = cellfun(@(x) ~isempty(x), matches);
 % Filter the original list to keep only participant folders with 'sub-###' format
 files = files1(isDir);
 files = files(bool);
-
-for i =1%2:length(files)
+ID = [];
+for i = 29:length(files)
     %subject loop begins
     subject = str2double(regexp(files(i).name, '\d+', 'match'));
   
@@ -39,10 +39,13 @@ for i =1%2:length(files)
     load(fileInfo(1).name);
 
     %run 1st level analysis function
-    TrHu_1stL_01(mri);
+    try 
+        TrHu_1stL_02(mri); %for more predictors
+    catch
+        ID(end+1) = subject;
+    end
+    %TrHu_1stL_01_oneReg(mri); %for one predictor
+    %TrHu_1stL_mask(mri); %with snvta mask
 
     disp(['Subject' num2str(subject) ':finished.'])
-
-
-
 end 

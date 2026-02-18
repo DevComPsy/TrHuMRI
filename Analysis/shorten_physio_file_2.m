@@ -3,9 +3,9 @@
 clc; close all; clear;
 
 %change this to your path
-data_path = 'D:\Observational Study\Information_gathering-main\Analysis\';
-addpath(genpath('D:\BE Code\gen_funct-master'));
-addpath(genpath('D:\Observational Study\Information_gathering-main\Analysis'));
+data_path = 'D:\InformationGatheringMRI\derivatives\';
+% addpath(genpath('D:\BE Code\gen_funct-master'));
+addpath(genpath('D:\InformationGatheringMRI\derivatives\'));
 
 %get foldernames
 files1 = dir(data_path);
@@ -23,7 +23,7 @@ files = files1(isDir);
 files = files(bool);
 
 
-for i = 18:length(files)
+for i = 1:length(files)
     %subject loop begins
     subject = str2double(regexp(files(i).name, '\d+', 'match'));
   
@@ -34,7 +34,7 @@ for i = 18:length(files)
     for b = 1:4
 
        % get paths to movement regressors
-        path_to_move_params{b} =  {['D:\Observational Study\Information_gathering-main\Analysis\sub-' num2str(subject)...
+        path_to_move_params{b} =  {['D:\InformationGatheringMRI\derivatives\sub-' num2str(subject)...
         '\physio\multiple_regressors-run' num2str(b) '.txt']};
         
         %read in movement parameter regressor
@@ -44,7 +44,7 @@ for i = 18:length(files)
         cut_file = ori_file(:, 1:24);
         
         % Save to .txt file
-        filename = ['D:\Observational Study\Information_gathering-main\Analysis\sub-' num2str(subject)...
+        filename = ['D:\InformationGatheringMRI\derivatives\sub-' num2str(subject)...
         '\physio\multiple_regressors_new-run' num2str(b) '.txt'];
         writematrix(cut_file, filename, 'Delimiter', '\t');
 

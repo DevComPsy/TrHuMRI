@@ -1,60 +1,38 @@
 function EL_2ndL(analysis_num)
 % 
-if isinteger(analysis_num) || isnumeric(analysis_num)
-    analysis_num = num2str(analysis_num,'%02d');
-end
-
-%%
-
-
-l1_dir = 'D:\InformationGatheringMRI\derivatives\';
-
-files1 = dir(l1_dir);
-
-% Filter out items that are not directories and ensure names start with 'sub-' followed by digits only
-isDir = [files1.isdir];
-names = {files1(isDir).name};
-matches = regexp(names, '^sub-\d+$', 'match');
-
-bool = cellfun(@(x) ~isempty(x), matches);
-
-% Filter the original list to keep only participant folders with 'sub-###' format
-files = files1(isDir);
-files = files(bool);
-sl = [];
-
-for s = 1:length(files)
-    %subject loop begins
-    % subject = str2double(regexp(files(i).name, '\d+', 'match'));
-  
-     %make sure we're in correct subject's func folder
-    sl{s} = [l1_dir files(s).name  '\1stL\' analysis_num  ];
-end
-
-sl(21) = [];
-
- res_dir = ['D:\InformationGatheringMRI\derivatives\Analysis\2ndL\' analysis_num '\'];
-mkdir(res_dir)
-
-% %% get sl
-% list = dir([l1_dir '1*']);
-% for s = 1:length(list)
-%     sl(s) = str2num(list(s).name);
+% if isinteger(analysis_num) || isnumeric(analysis_num)
+%     analysis_num = num2str(analysis_num,'%02d');
 % end
 
+%%
+l1_dir = ['D:\InformationGatheringMRI\derivatives\Analysis\1stL\' analysis_num '\'];
+res_dir = ['D:\InformationGatheringMRI\derivatives\Analysis\Analysis\2ndL\' analysis_num '\'];
+mkdir(res_dir)
+
+%% get sl
+list = dir([l1_dir '1*']);
+list(23) = [];
+sl = [];
+for s = 1:length(list)
+    sl(s) = str2num(list(s).name);
+end
+%remove 122 who is problematic
+sl(sl == 122) = []; 
+sl(sl == 106) = [];
 
 %% load one subject & get cons
-load([sl{1} '\SPM.mat'])
+load([l1_dir int2str(sl(1)) '\SPM.mat'])
 con_names = {SPM.xCon(:).name};
 
 %% get filenames and check con names
 fprintf('checking cons for consistency')
 for s = 1:length(sl)
+    load([l1_dir int2str(sl(1)) '\SPM.mat'])
     for c = 1:length(con_names)
         if ~strcmp(con_names{c},SPM.xCon(c).name)
             error(['subject ' int2str(sl(s)) ': contrast ' int2str(c) ': names do not match (' con_names{c} ' vs  ' SPM.xCon(c).name])
         end
-        con_fls{c,s} =strcat(string(sl(s)), '\', SPM.xCon(c).Vcon.fname, ',1');
+        con_fls{c,s} = [l1_dir int2str(sl(s)) '\' SPM.xCon(c).Vcon.fname ',1'];
     end
 end
 
@@ -106,7 +84,7 @@ for c = 1:size(con_fls,1)
     
     
     %% run batches
-    for i = 1:length(matlabbatch)
+    for i = 1:length(matlabbatch);
         spm_jobman('run',matlabbatch(i));
     end
 end

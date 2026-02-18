@@ -79,6 +79,7 @@ for s=1:con_num
     con_tmp = spm_vol(selected_outputs);
     xyz_tmp = con_tmp.mat\[ROI_xyz;ones(1,length(ROI_xyz))];
     maskBetas(s,:) = spm_sample_vol(con_tmp,xyz_tmp(1,:),xyz_tmp(2,:),xyz_tmp(3,:),0);
+
     maskXYZ(s,:,:) = xyz_tmp(1:3,:);
     maskMNI(s,:,:) = ROI_xyz;
     spm_progress_bar('Set', s);
@@ -94,8 +95,8 @@ cd(curr_dir);
 display('done');
 
 if verbose
-    % plot_ROIvoxels(squeeze(nanmean(maskBetas))',maskXYZ')
-     plot_ROIvoxels(squeeze(nanmean(maskBetas))',maskMNI')
+    plot_ROIvoxels(squeeze(nanmean(maskBetas))',maskXYZ')
+     % plot_ROIvoxels(squeeze(nanmean(maskBetas))',maskMNI')
 
 end
 

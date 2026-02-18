@@ -10,13 +10,14 @@ listsub = dir([sub_dir '\sub*']);
 
 
 %% Run the physio
-for sub = 32
+for sub = 22
     clearvars physio_dir_sub
     subID = listsub(sub).name(end-2:end); %find subject ID
         disp(['Participant no' num2str(subID)])
 
     physio_dir_sub = dir([sub_dir '\' listsub(sub).name '\physio']); %find physio files (can be done better)
     physio_dir_sub = physio_dir_sub(~ismember({physio_dir_sub(:).name},{'.','..'})); %Remove useless files
+    physio_dir_sub = physio_dir_sub(contains({physio_dir_sub.name}, 'biopac', 'IgnoreCase', true));
 
     % physio_dir_sub = physio_dir_sub(ismember({physio_dir_sub(:).name},{'multiple','txt'})); %Remove useless files
 
@@ -25,7 +26,8 @@ for sub = 32
     [~,ind]=sort({rp_file.name}); %make sure that it reads the block from 1 to 4
     rp_file = rp_file(ind);
 
-    for block =1:length(rp_file)
+    for block =1%1:length(rp_file)
+
 
         physio = readtable([physio_dir_sub(block).folder '\' physio_dir_sub(block).name]); %Read filename
 
@@ -37,17 +39,19 @@ for sub = 32
         lastZeroIdx = find(physio.Var5 == 0, 1, 'last');
 
         if lastZeroIdx > 1 
-            if block ==1  && sub ==23
+            if block ==1  && sub ==22 % 123
                 physio = physio(1:lastZeroIdx-1,:);
                 
             else
+        
+        % physio = physio(1:660195,:);
         physio = physio(lastZeroIdx:end,:);
             end
         end
 
 
     
-        if sub == 8 && block ==3
+        if sub == 8 && block ==3 % participant 108
             timeDiff = diff(physio.Var5);
             threshold = -0.9 * max(physio.Var5);  %threshold to consider a drop of time
             resetPoints = [0, find(timeDiff < threshold), length(physio.Var5)];
@@ -89,7 +93,13 @@ for sub = 32
 
         respiration = physio.Var2;
         pulse = physio.Var3;
+        if sub == 22 %123 (last t is a nan)
+        t(end) = [];
+        respiration(end) = []; 
+        pulse(end) = [];
+        end
         new_t = t(1):1/100:t(end); %new timing
+
         respiration_t =  interp1(t,respiration,new_t); %linear interpolation
         pulse_t =  interp1(t,pulse,new_t); %linear interpolation
 
@@ -109,8 +119,8 @@ for sub = 32
 
         matlabbatch{1}.spm.tools.physio.save_dir = {physio_dir_sub(block).folder };
         matlabbatch{1}.spm.tools.physio.log_files.vendor = 'Custom';
-        matlabbatch{1}.spm.tools.physio.log_files.cardiac = {respiration_dir};
-        matlabbatch{1}.spm.tools.physio.log_files.respiration = {pulse_dir};
+        matlabbatch{1}.spm.tools.physio.log_files.cardiac = {pulse_dir};
+        matlabbatch{1}.spm.tools.physio.log_files.respiration = {respiration_dir};
         matlabbatch{1}.spm.tools.physio.log_files.scan_timing = {''};
         matlabbatch{1}.spm.tools.physio.log_files.sampling_interval = 0.01;
         matlabbatch{1}.spm.tools.physio.log_files.relative_start_acquisition = 0;

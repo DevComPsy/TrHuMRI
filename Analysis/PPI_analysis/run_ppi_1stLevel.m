@@ -1,0 +1,51 @@
+%loop to run all subjects for 1st level PPI analysis 
+
+clc; close all; clear;
+
+%change this to your path
+data_path = 'D:\Observational Study\Information_gathering-main\Analysis\';
+addpath(genpath('D:\BE Code\gen_funct-master'));
+addpath(genpath('D:\Observational Study\Information_gathering-main\Analysis'));
+
+%get foldernames
+files1 = dir(data_path);
+
+% Filter out items that are not directories and ensure names start with 'sub-' followed by digits only
+isDir = [files1.isdir];
+names = {files1(isDir).name};
+matches = regexp(names, '^sub-\d+$', 'match');
+
+% Create a logical array where each entry is true if a match was found for the entire name
+bool = cellfun(@(x) ~isempty(x), matches);
+
+% Filter the original list to keep only participant folders with 'sub-###' format
+files = files1(isDir);
+files = files(bool);
+
+%adapt accordingly
+analysis_num = '2';
+coi = 'totev'; %behavioural column
+voi = '4_dmpfc'; %volume extracted
+
+for i = 22:length(files)
+    %subject loop begins
+    subject = str2double(regexp(files(i).name, '\d+', 'match'));
+  
+     %make sure we're in correct subject's func folder
+    mri_dir = [data_path 'sub-' num2str(subject)  '\' ];
+    cd(mri_dir);
+    
+    % load mri file 
+    pattern = [num2str(subject) '.mat'];
+
+    % Search for the file that matches the pattern
+    fileInfo = dir(pattern);
+
+    load(fileInfo(1).name);
+
+    %run 1st level ppi function
+    EL_1stL_ppi(mri, analysis_num, coi, voi); 
+  
+
+    disp(['Subject' num2str(subject) ':finished.'])
+end 
