@@ -15,6 +15,7 @@ behave_regression: conduct behavioural regression (use behaviour.csv)
 behave_plots: create plots and do behvioural analysis on horizon length influencing draws (horizon_data_all_subjects.csv)
 
 2) Main MRI analysis
+
 TrHu_1stL_DCS: 1st level analysis for decision-commitment signal, controlling for response (1 script)
 TrHu_1stL_bigModel: 1st level analysis for ESD(d-1), delta-ES, urgency, controlling for total current evidence (this one is for the PPI)
 TrHu_1stL_bigModel_withHorizon: model above but controlling for horizon length
@@ -23,6 +24,7 @@ TrHu_2ndL: general function for running 2nd level (also for PPI). Need to take a
 TrHU_2ndL('bigModel').
 
 3) Bar plots accompanying MRI analysis
+
 TrHU_1stL_single_trial1.m: conducts analysis on trial-by-trial cue presentation, so we can see brain activity at each time point.
 DCS_plot_trial_betas.m: for plotting figure 2B
 Totevminus_plot_perTrial_betas.m: for plotting figure 3B
@@ -30,6 +32,7 @@ deltaEV_plot_per_trial_betas.m: for plotting Figure
 urgency_plot_trial_betas.m: for plotting figure 4B
 
 4) PPI
+
 TrHu_1stL_bigModel: 1st level analysis for ESD(d-1), delta-ES, urgency, including total current evidence (from Main MRI analysis)
 RUN_extractVOI: obtain volume of interest from total ev- to be used in PPI analysis
 TrHu_1stL_ppi: Conducts PPI analysis 
