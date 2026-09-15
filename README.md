@@ -9,13 +9,13 @@ The first input is the subject number, the second one is the run. The task is co
 
 # Analysis Code
 
-1) Behavioural
+1) Behavioural (Behavioural_analysis)
 
 **behave_regression.m:** conduct behavioural regression (use behaviour.csv) 
 
 **behave_plots.m:** create plots and do behvioural analysis on horizon length influencing draws (horizon_data_all_subjects.csv)
 
-2) Main MRI analysis
+2) Main MRI analysis (Main_MRI_analysis)
 
 **TrHu_1stL_DCS.m:** 1st level analysis for decision-commitment signal, controlling for response (1 script)
 
@@ -28,7 +28,7 @@ The first input is the subject number, the second one is the run. The task is co
 **TrHu_2ndL.m:** general function for running 2nd level (also for PPI). Need to take analysis name from 1st levels above and include in function, e.g., 
 TrHU_2ndL('bigModel').
 
-3) Bar plots accompanying MRI analysis
+3) Bar plots accompanying MRI analysis (Single_trial_plots)
 
 **TrHU_1stL_single_trial1.m:** conducts analysis on trial-by-trial cue presentation, so we can see brain activity at each time point.
 
